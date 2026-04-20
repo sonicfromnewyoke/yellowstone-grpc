@@ -328,12 +328,16 @@ impl GeyserPlugin for Plugin {
         slot: u64,
     ) -> PluginResult<()> {
         self.with_inner(|inner| {
-            let ReplicaDeshredTransactionInfoVersions::V0_0_1(transaction) = transaction;
-
-            let message = Message::DeshredTransaction(MessageDeshredTransaction::from_geyser(
-                transaction,
-                slot,
-            ));
+            let message = match transaction {
+                ReplicaDeshredTransactionInfoVersions::V0_0_1(info) => {
+                    Message::DeshredTransaction(MessageDeshredTransaction::from_geyser(info, slot))
+                }
+                ReplicaDeshredTransactionInfoVersions::V0_0_2(info) => {
+                    Message::DeshredTransaction(
+                        MessageDeshredTransaction::from_geyser_v2(info, slot),
+                    )
+                }
+            };
             inner.send_message(message);
 
             Ok(())

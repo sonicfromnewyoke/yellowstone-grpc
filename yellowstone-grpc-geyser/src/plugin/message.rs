@@ -2,7 +2,8 @@ use {
     super::convert_to,
     agave_geyser_plugin_interface::geyser_plugin_interface::{
         ReplicaAccountInfoV3, ReplicaBlockInfoV4, ReplicaDeshredTransactionInfo,
-        ReplicaEntryInfoV2, ReplicaTransactionInfoV3, SlotStatus as GeyserSlotStatus,
+        ReplicaDeshredTransactionInfoV2, ReplicaEntryInfoV2, ReplicaTransactionInfoV3,
+        SlotStatus as GeyserSlotStatus,
     },
     bytes::Bytes,
     prost_types::Timestamp,
@@ -410,23 +411,44 @@ pub struct MessageDeshredTransactionInfo {
 
 impl MessageDeshredTransactionInfo {
     pub fn from_geyser(info: &ReplicaDeshredTransactionInfo<'_>) -> Self {
-        let static_account_keys: HashSet<Pubkey> = info
-            .transaction
+        Self::build(
+            info.signature,
+            info.is_vote,
+            info.transaction,
+            info.loaded_addresses,
+        )
+    }
+
+    pub fn from_geyser_v2(info: &ReplicaDeshredTransactionInfoV2<'_>) -> Self {
+        Self::build(
+            info.signature,
+            info.is_vote,
+            info.transaction,
+            info.loaded_addresses,
+        )
+    }
+
+    fn build(
+        signature: &Signature,
+        is_vote: bool,
+        transaction: &solana_transaction::versioned::VersionedTransaction,
+        loaded_addresses: Option<&solana_message::v0::LoadedAddresses>,
+    ) -> Self {
+        let static_account_keys: HashSet<Pubkey> = transaction
             .message
             .static_account_keys()
             .iter()
             .copied()
             .collect();
 
-        let (loaded_writable_addresses, loaded_readonly_addresses) = info
-            .loaded_addresses
+        let (loaded_writable_addresses, loaded_readonly_addresses) = loaded_addresses
             .map(|la| (la.writable.clone(), la.readonly.clone()))
             .unwrap_or_default();
 
         Self {
-            signature: *info.signature,
-            is_vote: info.is_vote,
-            transaction: convert_to::create_transaction(info.transaction),
+            signature: *signature,
+            is_vote,
+            transaction: convert_to::create_transaction(transaction),
             static_account_keys,
             loaded_writable_addresses,
             loaded_readonly_addresses,
@@ -453,6 +475,14 @@ impl MessageDeshredTransaction {
     pub fn from_geyser(info: &ReplicaDeshredTransactionInfo<'_>, slot: Slot) -> Self {
         Self {
             transaction: Arc::new(MessageDeshredTransactionInfo::from_geyser(info)),
+            slot,
+            created_at: Timestamp::from(SystemTime::now()),
+        }
+    }
+
+    pub fn from_geyser_v2(info: &ReplicaDeshredTransactionInfoV2<'_>, slot: Slot) -> Self {
+        Self {
+            transaction: Arc::new(MessageDeshredTransactionInfo::from_geyser_v2(info)),
             slot,
             created_at: Timestamp::from(SystemTime::now()),
         }
