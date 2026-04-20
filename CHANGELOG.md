@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Note:** Version 0 of Semantic Versioning is handled differently from version 1 and above.
 The minor version will be incremented upon a breaking change and the patch version will be incremented for features.
 
+## 2026-04-21 (4.1.0-alfa)
+
+- yellowstone-grpc-client-13.0.0+triton-ext.master
+- yellowstone-grpc-client-simple-13.0.0+triton-ext.master
+- yellowstone-grpc-geyser-13.0.0+triton-ext.master
+- yellowstone-grpc-proto-13.0.0+triton-ext.master
+
+### Changes
+
+- deps: repoint agave/solana git dependencies from tag `v4.0.0-beta.6-triton-public` to `rpcpool/solana-public` branch `master`
+- deps: convert workspace solana-account-decoder / solana-storage-proto / solana-transaction-context / solana-transaction-status from pinned `=4.0.0-beta.6` crates.io versions to git deps on rpcpool/solana-public master
+
 ## 2026-04-10
 
 - yellowstone-grpc-proto-12.2.0
