@@ -84,11 +84,11 @@ solana-account = "3.4.0"
 solana-clock = "3.0.1"
 solana-hash = "4.2.0"
 solana-keypair = "3.1.0"
-solana-message = "3.1.0"
+solana-message = "4.1.0"
 solana-pubkey = "4.1.0"
 solana-signature = "3.3.0"
 solana-signer = "3.0.0"
-solana-transaction = "3.1.0"
+solana-transaction = "4.1.0"
 solana-transaction-error = "3.0.0"
 
 # Solana Misc
